@@ -1,0 +1,21 @@
+{
+    "manifest_version": 2,
+
+    "name": "Rainbow Tabs",
+    "description": "Helpfully sorts your tabs by favicon color.",
+    "version": "1.0",
+
+    "permissions": [
+        "tabs",
+        "chrome://favicon/"
+    ],
+    "browser_action": {
+        "default_icon": "icon.png",
+        "name": "Click to sort tabs by color"
+    },
+
+    "background": {
+        "scripts": ["color-thief/src/color-thief.js", "background.js"],
+        "persistent": false
+    }
+}
