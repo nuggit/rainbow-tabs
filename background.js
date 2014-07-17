@@ -1,11 +1,8 @@
 // Rainbow Tabs: a chrome extension.
 // 2014 Nagisa Day. Uses the tool color-thief by lokesh from github.
 
-var global;
+var rainbowTabs = function() {
 
-var rainbowTabs = (function() {
-
-    var allTabs = [];
     var colorIndexList = [];
     var colorThief = new ColorThief();
 
@@ -16,37 +13,51 @@ var rainbowTabs = (function() {
     var MAX_HUE = 360;
     var PREFIX = "tab";
 
-    var rainbowSort = function(tabs) {
-        tabs.forEach(function(tab) {
-            getColorIndexForTab(tab);
+    var run = function() {
+        colorIndexList.length = 0;
+        faviconsLoaded = 0;
+        chrome.tabs.query({ currentWindow: true }, function (tabs) {
+            tabCount = tabs.length;
+            tabs.forEach(function(tab) {
+                findTabColor(tab);
+            });
         });
     };
 
-    var getColorIndexForTab = function(tab) {
+    var findTabColor = function(tab) {
         if(tab.favIconUrl) {
             var iconImg = document.createElement('img');
             iconImg.src = "chrome://favicon/" + tab.url;
             iconImg.onload = function() {
                 var rgb = colorThief.getColor(this);
                 var hue = getHueFromRgb(rgb);
-                insertHueIntoColorIndexList(tab.id, hue);
+//                var colors = colorThief.getPalette(this,3,5);
+//                var bestHue = MAX_HUE;
+//                for(var i=0; i < colors.length; i++) {
+//                    var rgb = colors[i];
+//                    if(bestHue == MAX_HUE) {
+//                        bestHue = getHueFromRgb(rgb);
+//                    }
+//                }
+                storeHueForTab(tab.id, hue);
+//                storeHueForTab(tab.id, bestHue);
             };
         }
         else {
-            insertHueIntoColorIndexList(tab.id, MAX_HUE);
+            storeHueForTab(tab.id, MAX_HUE);
         }
     };
 
-    var insertHueIntoColorIndexList = function(tabId, hue) {
+    var storeHueForTab = function(tabId, hue) {
         colorIndexList[PREFIX + tabId] = hue;
         faviconsLoaded++;
 
         if(faviconsLoaded == tabCount) {
-            continueRainbowSort();
+            reorderTabs();
         }
     };
 
-    var continueRainbowSort = function() {
+    var reorderTabs = function() {
         var newPosition = 0;
 
         bySortedValue(colorIndexList, function(key,value) {
@@ -54,7 +65,6 @@ var rainbowTabs = (function() {
             chrome.tabs.move(tabId,{index: newPosition++});
         });
     };
-
 
     // http://www.rapidtables.com/convert/color/rgb-to-hsv.htm
     var getHueFromRgb = function(rgb) {
@@ -87,21 +97,7 @@ var rainbowTabs = (function() {
         while (length--) callback.call(context, tuples[length][0], tuples[length][1]);
     };
     
-    return function() {
-        var _tabs;
-        var _faviconURLs;
+    return run;
+};
 
-        return {
-            run: function() {
-                chrome.tabs.query({ currentWindow: true }, function (tabs) {
-                    allTabs = tabs;
-                    tabCount = tabs.length;
-                    rainbowSort(tabs);
-                });
-            }
-        }
-    };
-})();
-
-var instance = rainbowTabs();
-chrome.browserAction.onClicked.addListener(instance.run);
+chrome.browserAction.onClicked.addListener(rainbowTabs());
