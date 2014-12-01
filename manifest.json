@@ -3,7 +3,7 @@
 
     "name": "Rainbow Tabs",
     "description": "Helpfully sorts your tabs by favicon color.",
-    "version": "1.0",
+    "version": "1.1",
 
     "permissions": [
         "tabs",
