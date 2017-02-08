@@ -3,20 +3,20 @@
 
 var rainbowTabs = function() {
 
-    var colorIndexList = [];
+    var tabIdColorLookup = {};
     var colorThief = new ColorThief();
 
     var tabCount;
     var faviconsLoaded = 0;
 
-    var MIN_SAT = 0;
     var MAX_HUE = 360;
+    var DEFAULT_COLOR = { hue: MAX_HUE, sat: 0, val: 0 };
     var PREFIX = "tab";
 
     var DEBUG = false;
 
     var run = function() {
-        colorIndexList.length = 0;
+        tabIdColorLookup = {};
         faviconsLoaded = 0;
         chrome.tabs.query({ currentWindow: true }, function (tabs) {
             tabCount = tabs.length;
@@ -26,6 +26,7 @@ var rainbowTabs = function() {
         });
     };
 
+    // Logging
     var log = function(msg, hexcolor) {
         if(DEBUG){
             if(hexcolor){
@@ -41,34 +42,16 @@ var rainbowTabs = function() {
     var log_hue = function(msg, hue) {
         if(DEBUG) log(msg, hueToHex(hue));
     };
+    var log_hsv = function(msg, hsv) {
+        if(DEBUG) log(msg + " // hue: " + hsv.hue.toFixed(2) + " sat: " + hsv.sat.toFixed(2) + " val: " + hsv.val.toFixed(2), hsvToHex(hsv));
+    };
 
     var findTabColor = function(tab) {
         if(tab.favIconUrl) {
             var iconImg = document.createElement('img');
             iconImg.src = "chrome://favicon/" + tab.url;
-
-            iconImg.onload = function() {
-                var colors = colorThief.getPalette(this,3,5);
-                var bestHue = MAX_HUE;
-                var bestSat = MIN_SAT;
-
-                for(var i = 0; i < colors.length; i++) {
-                    var rgb = colors[i];
-                    log_rgb("Current color", rgb);
-
-                    var hsv = getHsvFromRgb(rgb);
-                    if(hsv.hue < 0) hsv.hue = MAX_HUE + hsv.hue;
-
-                    // if saturation is greater than before,
-                    // and if the value is not too dark (eg very dark green just looks black)
-                    if(hsv.sat > bestSat && hsv.val > 0.2) {
-                        bestHue = hsv.hue;
-                        bestSat = hsv.sat;
-                        log_hue("Best hue so far:" + bestHue, bestHue);
-                    }
-                }
-                if(bestHue == MAX_HUE) log("We could not find a good hue.");
-                storeHueForTab(tab.id, bestHue);
+            iconImg.onload = function () {
+                storeColorForImage(this, tab);
             };
         }
         else {
@@ -76,8 +59,38 @@ var rainbowTabs = function() {
         }
     };
 
+    var storeColorForImage = function(imageElement, tab) {
+        if(DEBUG) console.log(imageElement);
+
+        var colors = colorThief.getPalette(imageElement, 3, 5);
+
+        var bestColor = colors
+            .map(getHsvFromRgb)
+            .filter(valueSaturationFilter)
+            .reduce(primaryColor, DEFAULT_COLOR);
+
+        if(bestColor.sat == 0) log("We could not find a good primary color for this favicon.");
+        storeHueForTab(tab.id, bestColor.hue);
+    };
+
+    var valueSaturationFilter = function(hsv) {
+        var isBrightEnough = hsv.val > 0.3 && (hsv.val + hsv.sat > 1);
+
+        log_hsv("Is bright enough: " + isBrightEnough, hsv);
+
+        return isBrightEnough;
+    };
+
+    var primaryColor = function(bestSoFarColor, color) {
+        if (color.sat > bestSoFarColor.sat) {
+            log_hsv("Best hue so far:" + color.hue, color);
+            return color;
+        }
+        return bestSoFarColor;
+    };
+
     var storeHueForTab = function(tabId, hue) {
-        colorIndexList[PREFIX + tabId] = hue;
+        tabIdColorLookup[PREFIX + tabId] = hue;
         faviconsLoaded++;
 
         if(faviconsLoaded == tabCount) {
@@ -88,12 +101,13 @@ var rainbowTabs = function() {
     var reorderTabs = function() {
         var newPosition = 0;
 
-        bySortedValue(colorIndexList, function(key,value) {
+        bySortedValue(tabIdColorLookup, function(key,value) {
             var tabId = parseInt(key.substr(PREFIX.length));
-            chrome.tabs.move(tabId,{index: newPosition++});
+            chrome.tabs.move(tabId, { index: newPosition++ });
         });
     };
 
+    // Color conversions
     // http://www.rapidtables.com/convert/color/rgb-to-hsv.htm
     var getHsvFromRgb = function(rgb) {
         var r = rgb[0] / 255;
@@ -118,7 +132,6 @@ var rainbowTabs = function() {
     };
 
     var rgbToHex = function(rgb) {
-        log(rgb);
         var r = Math.round(rgb[0]).toString(16),
             b = Math.round(rgb[1]).toString(16),
             g = Math.round(rgb[2]).toString(16);
@@ -133,11 +146,18 @@ var rainbowTabs = function() {
     };
 
     var hueToHex = function(hue) {
-        var sat = 1, val = 0.9;
+        return hsvToHex({ hue: hue, sat: 1, val: 0.9 });
+    };
+
+    var hsvToHex = function(hsv) {
+        var hue = hsv.hue;
+        if(hue < 0) {
+           hue = MAX_HUE + hue;
+        }
         var h = hue/60;
-        var c = val * sat;
+        var c = hsv.val * hsv.sat;
         var x = c * (1 - Math.abs((h) % 2 - 1));
-        var m = val - c;
+        var m = hsv.val - c;
         var z = 0;
 
         c = Math.floor((c+m) * 256);
