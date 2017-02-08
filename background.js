@@ -11,7 +11,7 @@ var rainbowTabs = function() {
 
     var MAX_HUE = 360;
     var DEFAULT_COLOR = { hue: MAX_HUE, sat: 0, val: 0 };
-    var PREFIX = "tab";
+    var PREFIX = 'tab';
 
     var DEBUG = false;
 
@@ -26,30 +26,10 @@ var rainbowTabs = function() {
         });
     };
 
-    // Logging
-    var log = function(msg, hexcolor) {
-        if(DEBUG){
-            if(hexcolor){
-                console.log("%c" + msg, 'background:#' + hexcolor);
-            } else {
-                console.log(msg);
-            }
-        }
-    };
-    var log_rgb = function(msg, rgb) {
-        if(DEBUG) log(msg, rgbToHex(rgb));
-    };
-    var log_hue = function(msg, hue) {
-        if(DEBUG) log(msg, hueToHex(hue));
-    };
-    var log_hsv = function(msg, hsv) {
-        if(DEBUG) log(msg + " // hue: " + hsv.hue.toFixed(2) + " sat: " + hsv.sat.toFixed(2) + " val: " + hsv.val.toFixed(2), hsvToHex(hsv));
-    };
-
     var findTabColor = function(tab) {
         if(tab.favIconUrl) {
             var iconImg = document.createElement('img');
-            iconImg.src = "chrome://favicon/" + tab.url;
+            iconImg.src = 'chrome://favicon/' + tab.url;
             iconImg.onload = function () {
                 storeColorForImage(this, tab);
             };
@@ -69,21 +49,21 @@ var rainbowTabs = function() {
             .filter(valueSaturationFilter)
             .reduce(primaryColor, DEFAULT_COLOR);
 
-        if(bestColor.sat == 0) log("We could not find a good primary color for this favicon.");
+        if(bestColor.sat == 0) log('We could not find a good primary color for this favicon.');
         storeHueForTab(tab.id, bestColor.hue);
     };
 
     var valueSaturationFilter = function(hsv) {
         var isBrightEnough = hsv.val > 0.3 && (hsv.val + hsv.sat > 1);
 
-        log_hsv("Is bright enough: " + isBrightEnough, hsv);
+        log_hsv('Is bright enough: ' + isBrightEnough, hsv);
 
         return isBrightEnough;
     };
 
     var primaryColor = function(bestSoFarColor, color) {
         if (color.sat > bestSoFarColor.sat) {
-            log_hsv("Best hue so far:" + color.hue, color);
+            log_hsv('Best hue so far:' + color.hue, color);
             return color;
         }
         return bestSoFarColor;
@@ -105,6 +85,26 @@ var rainbowTabs = function() {
             var tabId = parseInt(key.substr(PREFIX.length));
             chrome.tabs.move(tabId, { index: newPosition++ });
         });
+    };
+
+    // Logging
+    var log = function(msg, hexcolor) {
+        if(DEBUG){
+            if(hexcolor){
+                console.log('%c' + msg, 'background:#' + hexcolor);
+            } else {
+                console.log(msg);
+            }
+        }
+    };
+    var log_rgb = function(msg, rgb) {
+        if(DEBUG) log(msg, rgbToHex(rgb));
+    };
+    var log_hue = function(msg, hue) {
+        if(DEBUG) log(msg, hueToHex(hue));
+    };
+    var log_hsv = function(msg, hsv) {
+        if(DEBUG) log(msg + ' // hue: ' + hsv.hue.toFixed(2) + ' sat: ' + hsv.sat.toFixed(2) + ' val: ' + hsv.val.toFixed(2), hsvToHex(hsv));
     };
 
     // Color conversions
@@ -171,12 +171,12 @@ var rainbowTabs = function() {
             case 3: return rgbToHex([z, x, c]);
             case 4: return rgbToHex([x, z, c]);
             case 5: return rgbToHex([c, z, x]);
-            default: return "000000";
+            default: return '000000';
         }
     };
 
     // http://stackoverflow.com/a/5200010
-    // Sort key:value "array" by value low to high, and run callback on each
+    // Sort key:value 'array' by value low to high, and run callback on each
     var bySortedValue = function(obj, callback, context) {
         var tuples = [];
         for(var key in obj) tuples.push([key, obj[key]]);
