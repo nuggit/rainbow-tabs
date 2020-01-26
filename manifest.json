@@ -1,30 +1,24 @@
 {
-    "manifest_version": 2,
+  "manifest_version": 2,
 
-    "name": "Rainbow Tabs",
-    "description": "Helpfully sorts your tabs by favicon color.",
-    "version": "1.2",
+  "name": "Rainbow Tabs",
+  "description": "Helpfully sorts your tabs by favicon color.",
+  "version": "1.2",
 
-    "permissions": [
-        "tabs",
-        "chrome://favicon/"
-    ],
-    "browser_action": {
-        "default_icon": "icon128.png",
-        "name": "Click to sort tabs by color"
-    },
+  "permissions": ["tabs", "chrome://favicon/"],
+  "browser_action": {
+    "default_icon": "Rainbow-Tabs-48.png",
+    "name": "Click to sort tabs by color"
+  },
 
-    "icons": {
-        "16": "icon16.png",
-        "48": "icon48.png",
-        "128": "icon128.png"
-    },
+  "icons": {
+    "16": "Rainbow-Tabs-16.png",
+    "48": "Rainbow-Tabs-48.png",
+    "128": "Rainbow-Tabs-128.png"
+  },
 
-    "background": {
-        "scripts": [
-            "color-thief/src/color-thief.js",
-            "background.js"
-        ],
-        "persistent": false
-    }
+  "background": {
+    "scripts": ["color-thief/src/color-thief.js", "background.js"],
+    "persistent": false
+  }
 }
