@@ -81,7 +81,7 @@ var rainbowTabs = function() {
   var reorderTabs = function() {
     var newPosition = 0;
 
-    bySortedValue(tabIdColorLookup, function(key, value) {
+    bySortedValue(tabIdColorLookup, (key, hue) => {
       var tabId = parseInt(key.substr(PREFIX.length));
       chrome.tabs.move(tabId, { index: newPosition++ });
     });
@@ -197,22 +197,17 @@ var rainbowTabs = function() {
     }
   };
 
-  // http://stackoverflow.com/a/5200010
+  // Adapted from http://stackoverflow.com/a/5200010
   // Sort key:value 'array' by value low to high, and run callback on each
   var bySortedValue = function(obj, callback, context) {
     var tuples = [];
     for (var key in obj) tuples.push([key, obj[key]]);
 
-    tuples.sort(function(a, b) {
-      var aVal = a[1],
-        bVal = b[1];
-      if (aVal < bVal) return 1;
-      if (aVal > bVal) return -1;
-      return 0;
-    });
-    var length = tuples.length;
-    while (length--)
-      callback.call(context, tuples[length][0], tuples[length][1]);
+    tuples.sort((a, b) => a[1] - b[1]);
+
+    for (let i = 0; i < tuples.length; i++) {
+      callback.call(context, tuples[i][0], tuples[i][1]);
+    }
   };
 
   return run;
