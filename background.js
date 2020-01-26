@@ -13,8 +13,6 @@ var rainbowTabs = function() {
   var DEFAULT_COLOR = { hue: MAX_HUE, sat: 0, val: 0 };
   var PREFIX = 'tab';
 
-  var DEBUG = false;
-
   var run = function() {
     tabIdColorLookup = {};
     faviconsLoaded = 0;
@@ -39,8 +37,6 @@ var rainbowTabs = function() {
   };
 
   var storeColorForImage = function(imageElement, tab) {
-    if (DEBUG) console.log(imageElement);
-
     var colors = colorThief.getPalette(imageElement, 3, 5);
 
     var bestColor = colors
@@ -48,22 +44,22 @@ var rainbowTabs = function() {
       .filter(valueSaturationFilter)
       .reduce(primaryColor, DEFAULT_COLOR);
 
-    if (bestColor.sat == 0)
-      log('We could not find a good primary color for this favicon.');
+    // if (bestColor.sat == 0)
+    //   log('We could not find a good primary color for this favicon.');
     storeHueForTab(tab.id, bestColor.hue);
   };
 
   var valueSaturationFilter = function(hsv) {
     var isBrightEnough = hsv.val > 0.3 && hsv.val + hsv.sat > 1;
 
-    log_hsv('Is bright enough: ' + isBrightEnough, hsv);
+    // log_hsv('Is bright enough: ' + isBrightEnough, hsv);
 
     return isBrightEnough;
   };
 
   var primaryColor = function(bestSoFarColor, color) {
     if (color.sat > bestSoFarColor.sat) {
-      log_hsv('Best hue so far:' + color.hue, color);
+      // log_hsv('Best hue so far:' + color.hue, color);
       return color;
     }
     return bestSoFarColor;
@@ -89,32 +85,29 @@ var rainbowTabs = function() {
 
   // Logging
   var log = function(msg, hexcolor) {
-    if (DEBUG) {
-      if (hexcolor) {
-        console.log('%c' + msg, 'background:#' + hexcolor);
-      } else {
-        console.log(msg);
-      }
+    if (hexcolor) {
+      console.log('%c' + msg, 'background:#' + hexcolor);
+    } else {
+      console.log(msg);
     }
   };
   var log_rgb = function(msg, rgb) {
-    if (DEBUG) log(msg, rgbToHex(rgb));
+    log(msg, rgbToHex(rgb));
   };
   var log_hue = function(msg, hue) {
-    if (DEBUG) log(msg, hueToHex(hue));
+    log(msg, hueToHex(hue));
   };
   var log_hsv = function(msg, hsv) {
-    if (DEBUG)
-      log(
-        msg +
-          ' // hue: ' +
-          hsv.hue.toFixed(2) +
-          ' sat: ' +
-          hsv.sat.toFixed(2) +
-          ' val: ' +
-          hsv.val.toFixed(2),
-        hsvToHex(hsv)
-      );
+    log(
+      msg +
+        ' // hue: ' +
+        hsv.hue.toFixed(2) +
+        ' sat: ' +
+        hsv.sat.toFixed(2) +
+        ' val: ' +
+        hsv.val.toFixed(2),
+      hsvToHex(hsv)
+    );
   };
 
   // Color conversions
