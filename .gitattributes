@@ -1,0 +1,4 @@
+# Normalize line endings for web files to LF
+*.js text eol=lf
+*.json text eol=lf
+*.html text eol=lf
