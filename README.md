@@ -8,11 +8,24 @@ Uses lokesh's [color-thief](https://github.com/lokesh/color-thief).
 
 [I have a Trello board for this.](https://trello.com/b/Bpb77reD/rainbow-tabs)
 
-## Usage
+## Installation
 
-1. Clone rainbow-tabs. Also do a `git submodule init; git submodule update`
-2. Go to Settings -> Extensions in Chrome
-3. Check "Developer Mode" in upper right
-4. Click "Load unpacked extension" button and open your rainbow-tabs directory
-5. Click your new "rainbow" button
-6. Use it, edit it, reload extension, etc
+### From Source (Developer Mode)
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/yourusername/rainbow-tabs.git
+   cd rainbow-tabs
+   ```
+
+2. Open Chrome and navigate to `chrome://extensions/`
+
+3. Enable "Developer mode" (toggle in upper right corner)
+
+4. Click "Load unpacked" and select the `rainbow-tabs` directory
+
+5. Click the Rainbow Tabs extension icon in your toolbar to sort your current window's tabs by color
+
+### From Chrome Web Store
+
+Coming soon!
