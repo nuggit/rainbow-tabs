@@ -1,8 +1,8 @@
 # Rainbow Tabs
 
-It's a Chrome extension to sort your tabs by favicon color. Install it from the [Chrome Web Store](https://chrome.google.com/webstore/detail/rainbow-tabs/khedhoedfamallgnpngiginbiffemgho) (last updated: Nov 2014)
+It's a Chrome extension to sort your tabs by favicon color.
 
-Uses lokesh's [color-thief](https://github.com/lokesh/color-thief).
+Uses lokesh's [color-thief](https://github.com/lokesh/color-thief) for color extraction.
 
 ## Todo
 
@@ -14,7 +14,7 @@ Uses lokesh's [color-thief](https://github.com/lokesh/color-thief).
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/rainbow-tabs.git
+   git clone https://github.com/nuggit/rainbow-tabs.git
    cd rainbow-tabs
    ```
 
@@ -29,3 +29,5 @@ Uses lokesh's [color-thief](https://github.com/lokesh/color-thief).
 ### From Chrome Web Store
 
 Coming soon!
+
+The outdated and disabled extension on Chrome Web Store last updated 2017: [Rainbow Tabs](https://chrome.google.com/webstore/detail/rainbow-tabs/khedhoedfamallgnpngiginbiffemgho)
